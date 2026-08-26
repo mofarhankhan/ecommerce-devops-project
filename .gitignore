@@ -14,3 +14,4 @@ node_modules/
 # Editor files
 .vscode/
 .idea/
+k8s/secret.yml
