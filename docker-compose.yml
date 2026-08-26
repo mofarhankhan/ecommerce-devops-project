@@ -1,0 +1,74 @@
+version: '3.9'
+
+services:
+
+  mysql:
+    image: mysql:8
+    container_name: ecommerce_mysql
+    networks:
+      - ecommerce-network
+    env_file:
+      - .env
+
+    environment:
+       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+
+       MYSQL_DATABASE: ${MYSQL_DATABASE}
+
+       MYSQL_USER: ${MYSQL_USER}
+      
+       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
+    ports:
+      - "3306:3306"
+
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+      - ./database/init.sql:/docker-entrypoint-initdb.d/schema.sql
+
+  frontend:
+    build: ./frontend
+    container_name: ecommerce_frontend
+    restart: always
+    networks:
+      - ecommerce-network
+
+    ports:
+      - "5501:80"
+
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    container_name: ecommerce_backend
+    restart: always
+    networks:
+      - ecommerce-network
+
+    env_file:
+      - ./backend/.env
+
+    environment:
+      DB_HOST: ${DB_HOST}
+
+      DB_PORT: ${DB_PORT}
+
+      DB_NAME: ${DB_NAME}
+
+      DB_USER: ${DB_USER}
+
+      DB_PASSWORD: ${DB_PASSWORD}
+
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mysql
+
+volumes:
+  mysql-data:
+
+networks:
+  ecommerce-network:
+    driver: bridge
