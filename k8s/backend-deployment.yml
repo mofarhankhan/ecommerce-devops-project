@@ -24,9 +24,9 @@ spec:
       containers:
         - name: backend
 
-          image: devops-practice-backend:latest
+          image: mofarhankhann/ecommerce-backend:latest
 
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
 
           ports:
             - containerPort: 5000

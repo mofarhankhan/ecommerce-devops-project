@@ -16,8 +16,8 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: devops-practice-frontend:latest
-          imagePullPolicy: IfNotPresent
+          image: mofarhankhann/ecommerce-frontend:latest
+          imagePullPolicy: Always
 
           ports:
             - containerPort: 80
