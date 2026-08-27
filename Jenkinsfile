@@ -20,5 +20,12 @@ pipeline{
                 }
             }
         }
+	stage('Test Backend'){
+	    steps{
+		dir('backend'){
+		    sh 'npm test'
+		}
+	    }
+	}
     }
 }
