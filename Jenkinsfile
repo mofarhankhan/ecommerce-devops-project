@@ -37,5 +37,15 @@ pipeline{
         	 '''
 	    }
 	}
+	stage('Build Frontend Docker Image'){
+	    steps{
+		 sh '''
+		     docker build \
+		     -t mofarhankhann/ecommerce-frontend:${BUILD_NUMBER} \
+                     -t mofarhankhann/ecommerce-frontend:latest \
+                     ./frontend
+		 '''
+	    }
+	}
     }
 }
