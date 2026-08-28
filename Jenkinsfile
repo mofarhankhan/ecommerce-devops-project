@@ -20,32 +20,68 @@ pipeline{
                 }
             }
         }
-	stage('Test Backend'){
-	    steps{
-		dir('backend'){
-		    sh 'npm test'
-		}
-	    }
-	}
-	stage('Build Backend Docker Image'){
-	    steps{
-		 sh '''
-            	     docker build \
-            	     -t mofarhankhann/ecommerce-backend:${BUILD_NUMBER} \
-                     -t mofarhankhann/ecommerce-backend:latest \
-            	     ./backend
-        	 '''
-	    }
-	}
-	stage('Build Frontend Docker Image'){
-	    steps{
-		 sh '''
-		     docker build \
-		     -t mofarhankhann/ecommerce-frontend:${BUILD_NUMBER} \
-                     -t mofarhankhann/ecommerce-frontend:latest \
-                     ./frontend
-		 '''
-	    }
-	}
+        stage('Test Backend'){
+            steps{
+            dir('backend'){
+                sh 'npm test'
+            }
+            }
+        }
+        stage('Build Backend Docker Image'){
+            steps{
+            sh '''
+                docker build \
+                -t mofarhankhann/ecommerce-backend:${BUILD_NUMBER} \
+                -t mofarhankhann/ecommerce-backend:latest \
+                ./backend
+            '''
+            }
+        }
+        stage('Build Frontend Docker Image'){
+            steps{
+            sh '''
+                docker build \
+                -t mofarhankhann/ecommerce-frontend:${BUILD_NUMBER} \
+                -t mofarhankhann/ecommerce-frontend:latest \
+                ./frontend
+            '''
+            }
+        }
+        stage('Push Backend Image'){
+            steps{
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub-credentials',
+                        usernameVariable: 'DOCKERHUB_USERNAME',
+                        passwordVariable: 'DOCKERHUB_PASSWORD'
+                    )
+                ]){
+                    sh '''
+                        echo "$DOCKERHUB_PASSWORD" | docker login \
+                        -u "$DOCKERHUB_USERNAME" \
+                        --password-stdin
+
+                        docker push mofarhankhann/ecommerce-backend:${BUILD_NUMBER}
+                        docker push mofarhankhann/ecommerce-backend:latest
+                    '''
+                }
+            }
+        }
+        stage('Push Backend Image'){
+            steps{
+                withCredentials([
+                    usernamePassword(
+                        credentials: 'dockerhub-credentials'
+                        usernameVariable: 'DOCKERHUB_USERNAME'
+                        passwordVariable: 'DOCKERHUB_PASSWORD'
+                    )
+                ]){
+                    sh '''
+                        docker push mofarhankhann/ecommerce-frontend:${BUILD_NUMBER}
+                        docker push mofarhankhann/ecommerce-frontend:latest
+                     '''
+                }
+            }
+        }
     }
 }
