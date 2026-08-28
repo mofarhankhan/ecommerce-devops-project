@@ -87,7 +87,7 @@ pipeline{
         stage('Deploy To Kubernetes'){
             steps{
                 sh """
-                    sh makk@192.168.1.11 '
+                    ssh makk@192.168.1.11 '
                         kubectl set image deployment/backend-deployment \
                         backend=mofarhankhann/ecommerce-backend:${BUILD_NUMBER} \
                         -n devops-app
