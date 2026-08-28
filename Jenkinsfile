@@ -27,5 +27,15 @@ pipeline{
 		}
 	    }
 	}
+	stage('Build Backend Docker Image'){
+	    steps{
+		 sh '''
+            	     docker build \
+            	     -t mofarhankhann/ecommerce-backend:${BUILD_NUMBER} \
+                     -t mofarhankhann/ecommerce-backend:latest \
+            	     ./backend
+        	 '''
+	    }
+	}
     }
 }
