@@ -67,21 +67,22 @@ pipeline{
                 }
             }
         }
-        stage('Push Backend Image'){
-            steps{
-                withCredentials([
-                    usernamePassword(
-                        credentials: 'dockerhub-credentials'
-                        usernameVariable: 'DOCKERHUB_USERNAME'
-                        passwordVariable: 'DOCKERHUB_PASSWORD'
-                    )
-                ]){
-                    sh '''
-                        docker push mofarhankhann/ecommerce-frontend:${BUILD_NUMBER}
-                        docker push mofarhankhann/ecommerce-frontend:latest
-                     '''
-                }
+        
+        stage('Push Frontend Image'){
+        steps{
+            withCredentials([
+                usernamePassword(
+                    credentialsId: 'dockerhub-credentials',
+                    usernameVariable: 'DOCKERHUB_USERNAME',
+                    passwordVariable: 'DOCKERHUB_PASSWORD'
+                )
+            ]){
+                sh '''
+                    docker push mofarhankhann/ecommerce-frontend:${BUILD_NUMBER}
+                    docker push mofarhankhann/ecommerce-frontend:latest
+                '''
             }
         }
+    }
     }
 }
