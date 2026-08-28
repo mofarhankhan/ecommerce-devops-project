@@ -69,20 +69,35 @@ pipeline{
         }
         
         stage('Push Frontend Image'){
-        steps{
-            withCredentials([
-                usernamePassword(
-                    credentialsId: 'dockerhub-credentials',
-                    usernameVariable: 'DOCKERHUB_USERNAME',
-                    passwordVariable: 'DOCKERHUB_PASSWORD'
-                )
-            ]){
-                sh '''
-                    docker push mofarhankhann/ecommerce-frontend:${BUILD_NUMBER}
-                    docker push mofarhankhann/ecommerce-frontend:latest
-                '''
+            steps{
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub-credentials',
+                        usernameVariable: 'DOCKERHUB_USERNAME',
+                        passwordVariable: 'DOCKERHUB_PASSWORD'
+                    )
+                ]){
+                    sh '''
+                        docker push mofarhankhann/ecommerce-frontend:${BUILD_NUMBER}
+                        docker push mofarhankhann/ecommerce-frontend:latest
+                    '''
+                }
             }
         }
-    }
+        stage('Deploy To Kubernetes'){
+            steps{
+                sh """
+                    sh makk@192.168.1.11 '
+                        kubectl set image deployment/backend-deployment \
+                        backend=mofarhankhann/ecommerce-backend:${BUILD_NUMBER} \
+                        -n devops-app
+
+                        kubectl set image deployment/frontend-deployment \
+                        frontend=mofarhankhann/ecommerce-frontend:${BUILD_NUMBER} \
+                        -n devops-app
+                    '
+                """
+            }
+        }
     }
 }
