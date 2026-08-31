@@ -101,18 +101,40 @@ pipeline{
         }
         stage('Verify Kubernetes Deployment') {
             steps {
-                sh """
-                    ssh makk@192.168.1.11 "
-                        kubectl rollout status deployment/backend-deployment \
-                        -n devops-app \
-                        --timeout=120s
+                script {
+                    try {
 
-                        kubectl rollout status deployment/frontend-deployment \
-                        -n devops-app \
-                        --timeout=120s
-                    "
-                """
+                        sh """
+                            ssh makk@192.168.1.11 "
+                                kubectl rollout status deployment/backend-deployment \
+                                -n devops-app \
+                                --timeout=120s
+
+                                kubectl rollout status deployment/frontend-deployment \
+                                -n devops-app \
+                                --timeout=120s
+                            "
+                        """
+
+                    } catch (Exception e) {
+
+                        echo "Kubernetes deployment failed!"
+                        echo "Starting automatic rollback..."
+
+                        sh """
+                            ssh makk@192.168.1.11 "
+                                kubectl rollout undo deployment/backend-deployment \
+                                -n devops-app
+
+                                kubectl rollout undo deployment/frontend-deployment \
+                                -n devops-app
+                            "
+                        """
+
+                        error("Deployment failed. Previous version restored.")
+                    }
+                }
             }
-        }
+        } 
     }
 }
