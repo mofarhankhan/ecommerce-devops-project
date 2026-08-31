@@ -47,6 +47,21 @@ pipeline{
             '''
             }
         }
+        stage('Security Scan Docker Images') {
+            steps {
+                sh """
+                    trivy image \
+                    --severity HIGH,CRITICAL \
+                    --exit-code 1 \
+                    mofarhankhann/ecommerce-backend:${BUILD_NUMBER}
+
+                    trivy image \
+                    --severity HIGH,CRITICAL \
+                    --exit-code 1 \
+                    mofarhankhann/ecommerce-frontend:${BUILD_NUMBER}
+                """
+            }
+        }
         stage('Push Backend Image'){
             steps{
                 withCredentials([
@@ -134,6 +149,22 @@ pipeline{
                         error("Deployment failed. Previous version restored.")
                     }
                 }
+            }
+        }
+        stage('Application Health Check') {
+            steps {
+                sh """
+                    ssh makk@192.168.1.11 "
+                        kubectl run health-check-${BUILD_NUMBER} \
+                        --rm \
+                        -i \
+                        --restart=Never \
+                        --image=curlimages/curl:8.10.1 \
+                        -n devops-app \
+                        -- \
+                        curl -f http://backend-service:5000/
+                    "
+                """
             }
         } 
     }
