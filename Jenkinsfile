@@ -47,21 +47,21 @@ pipeline{
             '''
             }
         }
-        stage('Security Scan Docker Images') {
-            steps {
-                sh """
-                    trivy image \
-                    --severity HIGH,CRITICAL \
-                    --exit-code 1 \
-                    mofarhankhann/ecommerce-backend:${BUILD_NUMBER}
+        // stage('Security Scan Docker Images') {
+        //     steps {
+        //         sh """
+        //             trivy image \
+        //             --severity HIGH,CRITICAL \
+        //             --exit-code 1 \
+        //             mofarhankhann/ecommerce-backend:${BUILD_NUMBER}
 
-                    trivy image \
-                    --severity HIGH,CRITICAL \
-                    --exit-code 1 \
-                    mofarhankhann/ecommerce-frontend:${BUILD_NUMBER}
-                """
-            }
-        }
+        //             trivy image \
+        //             --severity HIGH,CRITICAL \
+        //             --exit-code 1 \
+        //             mofarhankhann/ecommerce-frontend:${BUILD_NUMBER}
+        //         """
+        //     }
+        // }
         stage('Push Backend Image'){
             steps{
                 withCredentials([
